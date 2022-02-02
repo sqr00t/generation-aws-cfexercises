@@ -27,6 +27,9 @@ Resources:
               - logs:CreateLogGroup
               - logs:CreateLogStream
               - logs:PutLogEvents
+              - s3:GetObject
+              - s3:PutObject
+              - s3:ListBucket
             Resource: '*'
 
   LambdaFunction:
@@ -37,20 +40,38 @@ Resources:
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         ZipFile: |
-            import logging, boto3
+            import logging, boto3, os
             LOGGER = logging.getLogger()
             LOGGER.setLevel(logging.INFO)
 
+            # takes NotificationConfiguration event var
+            # https://stackoverflow.com/questions/46928105/reading-files-triggered-by-s3-event
+            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#bucketnotification
             def handler(event, context):
                 bucket_name = event['Records'][0]['s3']['bucket']['name']
                 file_key = event['Records'][0]['s3']['object']['key']
                 LOGGER.info(f'New object in bucket: {bucket_name =}, {file_key =}')
+              
+            # Download s3 object from event to /tmp directory
+              # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.download_file
+              # update perms with s3:GetObject and s3:PutObject
+              # (needed to get, then put file to tmp, aka downloading from bucket to /tmp)
+                s3_client = boto3.client("s3")
+                s3 = boto3.resource('s3')
+                s3.meta.client.download_file(bucket_name, file_key, f'/tmp/{file_key}')
 
+            # Assert file downloaded and log results
+              # https://stackoverflow.com/questions/43768290/python-aws-lambda-function-how-to-view-tmp-storage/43768406
+                assert_dl = os.path.isfile('/tmp/' + file_key)
+                
+                return LOGGER.info(f'Assert {file_key} downloaded to /tmp/ :  {assert_dl}')
 
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: sqr00t-template3
+      # add comments below on first deploy, uncomment then update-stack
+      # sends event on triggered event type s3:ObjectCreated, invoked for LambdaFunction.arn attributes.
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
