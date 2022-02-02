@@ -37,21 +37,24 @@ Resources:
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         ZipFile: |
-            import logging
+            import logging, boto3
             LOGGER = logging.getLogger()
             LOGGER.setLevel(logging.INFO)
 
             def handler(event, context):
-              LOGGER.info(f'Event structure: {event}')
+                bucket_name = event['Records'][0]['s3']['bucket']['name']
+                file_key = event['Records'][0]['s3']['object']['key']
+                LOGGER.info(f'New object in bucket: {bucket_name =}, {file_key =}')
+
 
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: <BUCKET_NAME>
-      # NotificationConfiguration:
-      #   LambdaConfigurations:
-      #     - Event: s3:ObjectCreated:*
-      #       Function: !GetAtt LambdaFunction.Arn
+      BucketName: sqr00t-template3
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt LambdaFunction.Arn
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
