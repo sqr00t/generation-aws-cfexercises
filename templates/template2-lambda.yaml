@@ -29,6 +29,18 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: '*'
+      - PolicyName: ListBucketsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - s3:ListBucket
+            Resource: '*'
+
 
   LambdaFunction:
     Type: AWS::Lambda::Function
@@ -38,8 +50,17 @@ Resources:
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         ZipFile: |
-          import logging
-          LOGGER = logging.getLogger()
-          LOGGER.setLevel(logging.INFO)
-          def handler(event, context):
-            LOGGER.info(f'Event structure: {event}')
+            import boto3
+            import logging
+            LOGGER = logging.getLogger()
+            LOGGER.setLevel(logging.INFO)
+
+            s3_client = boto3.client("s3")
+
+            def handler(event, context):
+                request = s3_client.list_objects(
+                    Bucket = 'sqr00t-cf')
+
+                log_response = [x['Key'] for x in request['Contents']]
+
+                return LOGGER.info(f'Objects in Bucket: {log_response}')

@@ -2,7 +2,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Template to deploy an S3 bucket.
 
 Resources:
-  S3Bucket:
+  sqr00tbucket1:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: <BUCKET_NAME>
+      BucketName: sqr00t-cfbucket-1v2
+  sqr00tbucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: sqr00t-cfbucket-2v2

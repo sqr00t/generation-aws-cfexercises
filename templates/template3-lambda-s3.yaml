@@ -37,11 +37,12 @@ Resources:
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         ZipFile: |
-          import logging
-          LOGGER = logging.getLogger()
-          LOGGER.setLevel(logging.INFO)
-          def handler(event, context):
-            LOGGER.info(f'Event structure: {event}')
+            import logging
+            LOGGER = logging.getLogger()
+            LOGGER.setLevel(logging.INFO)
+
+            def handler(event, context):
+              LOGGER.info(f'Event structure: {event}')
 
   S3Bucket:
     Type: 'AWS::S3::Bucket'
