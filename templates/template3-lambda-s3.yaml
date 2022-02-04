@@ -56,7 +56,6 @@ Resources:
               # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.download_file
               # update perms with s3:GetObject and s3:PutObject
               # (needed to get, then put file to tmp, aka downloading from bucket to /tmp)
-                s3_client = boto3.client("s3")
                 s3 = boto3.resource('s3')
                 s3.meta.client.download_file(bucket_name, file_key, f'/tmp/{file_key}')
 
