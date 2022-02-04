@@ -42,8 +42,6 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
               - s3:GetObject
-              - s3:PutObject
-              - s3:ListBucket
             Resource: '*'
 # refers to ParameterKey=<key> in --parameters
 # https://hands-on.cloud/how-to-create-and-deploy-your-first-python-aws-lambda-function/#building-lambda-function-zip-archive
