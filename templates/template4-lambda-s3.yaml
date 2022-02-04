@@ -37,16 +37,22 @@ Resources:
           Statement:
           - Effect: Allow
             Action:
+            # update perms as appropriate when .py changes
               - logs:CreateLogGroup
               - logs:CreateLogStream
               - logs:PutLogEvents
+              - s3:GetObject
+              - s3:PutObject
+              - s3:ListBucket
             Resource: '*'
-
+# refers to ParameterKey=<key> in --parameters
+# https://hands-on.cloud/how-to-create-and-deploy-your-first-python-aws-lambda-function/#building-lambda-function-zip-archive
+# https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      Runtime: python3.9
-      Handler: index.handler
+      Runtime: python3.8
+      Handler: "lambda_function.handler" # points to module.function in lambda_function.py
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         S3Bucket: !Ref DeploymentBucket
@@ -56,6 +62,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref BucketName
+      # comment below on first run, uncomment after deploy success and update-stack
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*

@@ -1,0 +1,18 @@
+# windows repo source path in double quotes, for command prompt!
+
+Powershell:
+docker run --rm -v ${PWD}:/var/task "lambci/lambda:build-python3.8" /bin/sh -c "pip install -r requirements.txt -t build/packages; cd build/packages && zip -r ../deployment_package.zip .; cd ../../; rm -r build/packages; zip -g build/deployment_package.zip lambda_function.py; exit"
+
+Command Prompt: Replace ${PWD} with absolute windows path in double quotes
+docker run --rm -v "F:\Python\Workspaces\GenerationDataEngCourse\Course Working Files\aws-cloudformation\data-academy-cloudformation-example":/var/task "lambci/lambda:build-python3.8" /bin/sh -c "pip install -r requirements.txt -t build/packages; cd build/packages && zip -r ../deployment_package.zip .; cd ../../; rm -r build/packages; zip -g build/deployment_package.zip lambda_function.py; exit"
+
+Git bash: not working
+
+WSL2 bash: need to install docker/ make alias
+
+
+# cf create-stack command with parameters
+# https://docs.aws.amazon.com/lambda/latest/dg/python-package.html
+# https://hands-on.cloud/how-to-create-and-deploy-your-first-python-aws-lambda-function/#building-lambda-function-zip-archive
+
+aws cloudformation create-stack --stack-name sqr00t-template4stack --template-url https://sqr00t-cf.s3.eu-west-1.amazonaws.com/templates/template4-lambda-s3.yaml --region eu-west-1 --parameters ParameterKey=DeploymentBucket,ParameterValue='sqr00t-cf' ParameterKey=DeploymentPackageKey,ParameterValue='lambdas/deployment_package.zip' ParameterKey=BucketName,ParameterValue='sqr00t-template4bucket' --capabilities CAPABILITY_IAM
